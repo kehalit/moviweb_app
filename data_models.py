@@ -6,7 +6,7 @@ from sqlalchemy.sql.sqltypes import NULLTYPE
 
 db = SQLAlchemy()
 
-class Users(db.Model):
+class User(db.Model):
 
     __tablename__ = 'users'
 
@@ -17,7 +17,7 @@ class Users(db.Model):
     def __str__(self):
         return f"users(id = {self.id}, name = {self.name})"
 
-class Movies(db.Model):
+class Movie(db.Model):
 
     __tablename__ = 'movies'
 
