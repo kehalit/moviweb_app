@@ -1,20 +1,18 @@
 import os
-from tkinter.font import names
 
-from flask_sqlalchemy import SQLAlchemy
 from datamanager.data_manager_interface import DataManagerInterface
 from data_models import db, User, Movie
 
 
 # Database configuration
-basedir = os.path.abspath(os.path.dirname(__file__))
-database_path = os.path.join(basedir, 'data', 'movies.db')
-
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+database_path = os.path.join(basedir, 'db', 'movies.db')
+print(database_path)
 class SQLiteDataManager(DataManagerInterface):
     def __init__(self, app, db_file_name = "movies.db"):
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        db.init_app()
+        db.init_app(app)
 
         with app.app_context():
             db.create_all()
@@ -70,6 +68,6 @@ class SQLiteDataManager(DataManagerInterface):
         if not movie:
             return False
 
-        db.session.delete(movie)
+        db.session.delete(movie) #sew
         db.session.commit()
         return True
