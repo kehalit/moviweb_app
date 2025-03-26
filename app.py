@@ -50,12 +50,37 @@ def add_movie(user_id):
 
 
 @app.route('/users/<user_id>/update_movie/<movie_id>')
-def update_movie():
-    pass
+def update_movie(user_id, movie_id):
+    movie = data_manager.get_user_movies(user_id)
+    if movie is None:
+        return f"User with ID {user_id} not found.", 404
+
+    movie_to_update = next((m for m in movie if m.id == movie_id), None)
+    if movie_to_update is None:
+        return f"Movie with ID {movie_id} not found.", 404
+
+    if request.method == 'POST':
+        movie_to_update.name = request.form['name']
+        movie_to_update.director = request.form['director']
+        movie_to_update.year = int(request.form['year'])
+        movie_to_update.rating = float(request.form['rating'])
+        data_manager.update_movie(movie_to_update)
+        return redirect(url_for('user_movies', user_id=user_id))
+
+    return render_template('update_movie.html', movie=movie_to_update)
 
 @app.route('/users/<user_id>/delete_movie/<movie_id>')
-def delete_movie():
-    pass
+def delete_movie(user_id, movie_id):
+    movie = data_manager.get_user_movies(user_id)
+    if movie is None:
+        return f"User with ID {user_id} not found.", 404
+
+    movie_to_delete = next((m for m in movie if m.id == movie_id), None)
+    if movie_to_delete is None:
+        return f"Movie with ID {movie_id} not found.", 404
+
+    data_manager.delete_movie(movie_id)
+    return redirect(url_for('user_movies', user_id=user_id))
 
 
 if __name__ == "__main__":
