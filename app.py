@@ -24,13 +24,29 @@ def list_user_movies(user_id):
         return f"User with ID {user_id} not found.", 404
     return render_template('user_movies.html', user=user)
 
+
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
-  pass
+  if request.method == 'POST':
+      user_name = request.form['name']
+      new_user = data_manager.add_user(user_name)
+      return redirect(url_for('users_list'))
+  return render_template('add_user.html')
+
 
 @app.route('/users/<user_id>/add_movie', methods=['GET', 'POST'])
-def add_movie():
-    pass
+def add_movie(user_id):
+    if request.method == 'POST':
+        movie_name= request.form['movie_name']
+        director = request.form['director']
+        year = int(request.form['year'])
+        rating = float(request.form['rating'])
+        new_movie = data_manager.add_movie(user_id, movie_name, director, year, rating)
+        if new_movie:
+            return redirect(url_for('users_movies', user_id=user_id))
+        else:
+            return f"User with ID {user_id} not found.", 404
+    return render_template('add_movie.html', user_id=user_id)
 
 
 @app.route('/users/<user_id>/update_movie/<movie_id>')
