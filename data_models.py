@@ -25,12 +25,12 @@ class Movie(db.Model):
     movie_name = db.Column(db.String(255), nullable=False)
     director = db.Column(db.String(255), nullable = False)
     year = db.Column(db.Integer, nullable=False)
-    rating = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
     def __str__(self):
         return (
-                f"movies(id = {self.id}, movie_name={self.movie_name},"
+                f"movies(id = {self.movie_id}, movie_name={self.movie_name},"
                 f"director={self.director}, year={self.year},"
                 f"rating= {self.rating})"
         )
