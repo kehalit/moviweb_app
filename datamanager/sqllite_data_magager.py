@@ -29,6 +29,9 @@ class SQLiteDataManager(DataManagerInterface):
         #return all movie list
         return User.query.filter_by(user_id=user_id).first()
 
+    def get_movie(self, movie_id):
+        return Movie.query.filter_by(movie_id=movie_id).first()
+
     def add_user(self, name):
         #add new user to db
         new_user = User(name=name)
@@ -48,20 +51,8 @@ class SQLiteDataManager(DataManagerInterface):
 
     def update_movie(self, movie_id , movie_name=None, director=None, year=None, rating=None):
         #update details of a specific movie in db
-        movie = Movie.query.get(movie_id)
-        if not movie:
-            return None
-        if movie_name:
-            movie.movie_name = movie_name
-        if director:
-            movie.director = director
-        if year:
-            movie.year = year
-        if rating:
-            movie.rating = rating
-
         db.session.commit()
-        return movie
+        #return movie
 
 
     def delete_movie(self, movie_id):
