@@ -21,11 +21,13 @@ class SQLiteDataManager(DataManagerInterface):
         #return all users
         return User.query.all()
 
+    def get_user(self, user_id):
+        # Returns a single user by their ID
+        return User.query.get(user_id)
+
     def get_user_movies(self, user_id):
         #return all movie list
-        user = User.query.get(user_id) #!
-        return user.movies if user else None
-
+        return User.query.filter_by(user_id=user_id).first()
 
     def add_user(self, name):
         #add new user to db
