@@ -5,6 +5,21 @@
     <title>Title</title>
 </head>
 <body>
+  <div>
+    <h1>{{ user.name }}'s Favorite Movies 🎬</h1>
+    <ul>
+        {% for movie in movies %}
+            <li>
+              <strong> {{ movie.movie_name }}</strong> ({{ movie.year }}) - Directed by {{ movie.director }}
+              ⭐ {{ movie.rating }}/10
+              <a href="{{ url_for('update_movie', user_id=user.user_id, movie_id=movie.movie_id) }}">Edit</a>
+              <a href="{{ url_for('delete_movie', user_id=user.user_id, movie_id=movie.movie_id) }}" onclick="return confirm('Are you sure?');">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('add_movie', user_id=user.user_id) }}">➕ Add Movie</a>
+    <a href="{{ url_for('list_users') }}">Back to Users</a>
+  </div>
 
 </body>
 </html>
