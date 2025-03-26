@@ -1,8 +1,5 @@
 from crypt import methods
-
 from flask import Flask,render_template, request, redirect, url_for
-from sqlalchemy.testing.suite.test_reflection import users
-
 from datamanager.sqllite_data_magager import SQLiteDataManager
 
 app = Flask(__name__)
@@ -53,8 +50,8 @@ def add_movie(user_id):
         rating = request.form.get('rating')
 
         if movie_name and director and year and rating:
-            data_manager.add_movie(user_id, movie_name, director, year, rating)  # Save the movie to DB
-            return redirect(url_for('user_movies', user_id=user_id))  # Redirect to user's movie list
+            data_manager.add_movie(user_id, movie_name, director, year, rating)
+            return redirect(url_for('user_movies', user_id=user_id))
 
     return render_template('add_movie.html', user=user, movies=movies)  # Pass the user to the template
 
@@ -76,18 +73,19 @@ def update_movie(user_id, movie_id):
 
     return render_template('update_movie.html', movie=movie, user_id=user_id)
 
-@app.route('/users/<user_id>/delete_movie/<movie_id>')
-def delete_movie(user_id, movie_id):
-    movie = data_manager.get_user_movies(user_id)
-    if movie is None:
-        return f"User with ID {user_id} not found.", 404
 
-    movie_to_delete = next((m for m in movie if m.id == movie_id), None)
-    if movie_to_delete is None:
+@app.route('/users/<int:user_id>/delete_movie/<int:movie_id>', methods=['GET', 'POST'])
+def delete_movie(user_id, movie_id):
+    movie = data_manager.get_movie(movie_id)  # Fetch movie by ID
+    if movie is None:
         return f"Movie with ID {movie_id} not found.", 404
 
-    data_manager.delete_movie(movie_id)
-    return redirect(url_for('user_movies', user_id=user_id))
+    if request.method == 'POST':
+        data_manager.delete_movie(movie_id)  # Delete the movie
+        return redirect(url_for('user_movies', user_id=user_id))
+
+    return render_template('delete_movie.html', user_id=user_id, movie=movie)
+
 
 
 if __name__ == "__main__":
