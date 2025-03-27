@@ -2,10 +2,13 @@ import os
 import requests
 from datamanager.data_manager_interface import DataManagerInterface
 from data_models import db, User, Movie
+from dotenv import load_dotenv
 
 # OMDb API configuration
+load_dotenv()
+OMDB_API_URL = os.getenv('API_URL')
 OMDB_API_KEY = os.getenv('API_KEY')
-OMDB_URL = "http://www.omdbapi.com/"
+
 
 # Database configuration
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -27,7 +30,7 @@ class SQLiteDataManager(DataManagerInterface):
     def fetch_movie_details(self, movie_name):
         """Fetch movie details from OMDb API."""
         params = {"t": movie_name, "apikey": OMDB_API_KEY}
-        response = requests.get(OMDB_URL, params=params)
+        response = requests.get(OMDB_API_URL, params=params)
 
         if response.status_code == 200:
             data = response.json()
