@@ -59,12 +59,29 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.commit()
         return new_user
 
-    def add_movie(self, user_id, movie_name, director, year, rating):
-        # add new movie to db
-        user = User.query.get(user_id)
-        if not user:
-            return None
-        new_movie = Movie(movie_name = movie_name, director=director, year=year, rating=rating, user_id=user_id)
+    def add_movie(self, user_id, movie_name, director=None, year=None, rating=None):
+        """Add a new movie to the database, fetching details if available."""
+        movie_data = self.fetch_movie_details(movie_name)
+
+        # Use fetched data if available, otherwise use user input
+        if movie_data:
+            new_movie = Movie(
+                movie_name=movie_data["movie_name"],
+                director=movie_data["director"],
+                year=int(movie_data["year"]),
+                rating=float(movie_data["rating"]),
+                user_id=user_id
+            )
+        else:
+            # If OMDb does not provide data, use user input directly
+            new_movie = Movie(
+                movie_name=movie_name,
+                director=director,
+                year=int(year),
+                rating=float(rating),
+                user_id=user_id
+            )
+
         db.session.add(new_movie)
         db.session.commit()
         return new_movie
