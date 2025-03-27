@@ -3,10 +3,10 @@ from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
 
+# Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = "your_super_secret_key"
 data_manager = SQLiteDataManager(app)
-
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -18,6 +18,7 @@ def page_not_found(e):
 def internal_server_error(e):
     """Handles 500 Internal Server Error."""
     return render_template('500.html'), 500
+
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -32,6 +33,7 @@ def handle_exception(e):
 
 @app.route('/')
 def home():
+    """Displays the home page with the list of users."""
     try:
         users = data_manager.get_all_users()
         return render_template('home.html', users=users)
@@ -42,6 +44,7 @@ def home():
 
 @app.route('/users')
 def users_list():
+    """Displays the list of all users."""
     try:
         users = data_manager.get_all_users()
         return render_template('users.html', users=users)
@@ -52,6 +55,7 @@ def users_list():
 
 @app.route('/users/<int:user_id>')
 def user_movies(user_id):
+    """Displays a user's movies."""
     try:
         user = data_manager.get_user(user_id)
         if user is None:
@@ -67,6 +71,7 @@ def user_movies(user_id):
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
+    """Handles the addition of a new user."""
     try:
         if request.method == 'POST':
             user_name = request.form['name']
@@ -83,6 +88,7 @@ def add_user():
 
 @app.route('/users/<int:user_id>/add_movie', methods=['GET', 'POST'])
 def add_movie(user_id):
+    """Handles adding a movie for a specific user."""
     try:
         user = data_manager.get_user(user_id)
         if user is None:
@@ -110,6 +116,7 @@ def add_movie(user_id):
 
 @app.route('/users/<int:user_id>/update_movie/<int:movie_id>', methods=['GET', 'POST'])
 def update_movie(user_id, movie_id):
+    """Handles the update of a movie for a specific user."""
     try:
         movie = data_manager.get_movie(movie_id)
         if movie is None:
@@ -136,7 +143,6 @@ def update_movie(user_id, movie_id):
                     if float(movie_data_from_api['rating']) != movie.rating:
                         movie.rating = float(movie_data_from_api['rating'])
             else:
-
                 movie.movie_name = request.form['name']
                 movie.director = request.form['director']
                 movie.year = int(request.form['year'])
@@ -156,6 +162,7 @@ def update_movie(user_id, movie_id):
 
 @app.route('/users/<int:user_id>/delete_movie/<int:movie_id>', methods=['GET', 'POST'])
 def delete_movie(user_id, movie_id):
+    """Handles the deletion of a movie for a specific user."""
     try:
         movie = data_manager.get_movie(movie_id)
         if movie is None:
@@ -176,6 +183,7 @@ def delete_movie(user_id, movie_id):
 
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 def delete_user(user_id):
+    """Handles the deletion of a user."""
     try:
         user = data_manager.get_user(user_id)
         if user:
