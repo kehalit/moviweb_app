@@ -3,7 +3,7 @@ import requests
 from datamanager.data_manager_interface import DataManagerInterface
 from data_models import db, User, Movie
 
-
+# OMDb API configuration
 OMDB_API_KEY = os.getenv('API_KEY')
 OMDB_URL = "http://www.omdbapi.com/"
 
@@ -13,7 +13,10 @@ database_path = os.path.join(basedir, 'db', 'movies.db')
 
 
 class SQLiteDataManager(DataManagerInterface):
-    def __init__(self, app, db_file_name = "movies.db"):
+    """SQLite data manager for handling movie and user data in the database."""
+
+    def __init__(self, app, db_file_name="movies.db"):
+        """Initialize the data manager with Flask app and configure the database."""
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
@@ -38,29 +41,35 @@ class SQLiteDataManager(DataManagerInterface):
         return None  # Return None if movie not found
 
     def get_all_users(self):
-        #return all users
+        """Retrieve all users from the database."""
         return User.query.all()
 
     def get_user(self, user_id):
-        # Returns a single user by their ID
+        """Retrieve a user by their ID."""
         return User.query.get(user_id)
 
     def get_user_movies(self, user_id):
-        #return all movie list
+        """Retrieve all movies of a specific user by their user ID."""
         return User.query.filter_by(user_id=user_id).first()
 
     def get_movie(self, movie_id):
+        """Retrieve a specific movie by its ID."""
         return Movie.query.filter_by(movie_id=movie_id).first()
 
     def add_user(self, name):
-        #add new user to db
+        """Add a new user to the database."""
         new_user = User(name=name)
         db.session.add(new_user)
         db.session.commit()
         return new_user
 
     def add_movie(self, user_id, movie_name, director=None, year=None, rating=None):
-        """Add a new movie to the database, fetching details if available."""
+        """
+        Add a new movie to the database.
+
+        If movie details are available from OMDb API, use those. Otherwise,
+        use the provided user inputs.
+        """
         movie_data = self.fetch_movie_details(movie_name)
 
         # Use fetched data if available, otherwise use user input
@@ -86,28 +95,48 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.commit()
         return new_movie
 
-    def update_movie(self, movie_id , movie_name=None, director=None, year=None, rating=None):
-        #update details of a specific movie in db
-        db.session.commit()
-        #return movie
+    def update_movie(self, movie_id, movie_name=None, director=None, year=None, rating=None):
+        """
+        Update the details of a specific movie in the database.
 
+        Args:
+            movie_id (int): The ID of the movie to be updated.
+            movie_name (str, optional): The new movie name.
+            director (str, optional): The new director name.
+            year (int, optional): The new release year.
+            rating (float, optional): The new IMDB rating.
+        """
+        movie = Movie.query.get(movie_id)
+        if movie:
+            if movie_name:
+                movie.movie_name = movie_name
+            if director:
+                movie.director = director
+            if year:
+                movie.year = year
+            if rating:
+                movie.rating = rating
+
+            db.session.commit()
+            return movie
+        return None  # If the movie does not exist, return None
 
     def delete_movie(self, movie_id):
-        #delete specific movie from db
+        """Delete a specific movie from the database."""
         movie = Movie.query.get(movie_id)
         if not movie:
-            return False
+            return False  # Movie not found
 
-        db.session.delete(movie) #sew
+        db.session.delete(movie)
         db.session.commit()
-        return True
+        return True  # Successfully deleted the movie
 
     def delete_user(self, user_id):
+        """Delete a specific user from the database."""
         user = User.query.get(user_id)
         if not user:
-            return False
+            return False  # User not found
 
         db.session.delete(user)  # This will also delete related movies due to `cascade="all, delete-orphan"`
         db.session.commit()
-        return True
-
+        return True  # Successfully deleted the user
