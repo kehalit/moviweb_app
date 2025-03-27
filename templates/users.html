@@ -2,21 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - MovieWeb App</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
+    <div>
         <h1>Users</h1>
         <ul>
             {% for user in users %}
                 <li>
-                    <a href="{{ url_for('user_movies', user_id=user.user_id) }}">{{ user.name }}</a>
+                    {{ user.name }}
+                    <a href="{{ url_for('user_movies', user_id=user.user_id) }}">🎞️ View Movies</a> |
+                    <a href="{{ url_for('add_movie', user_id=user.user_id) }}">➕ Add Movie</a>
+
+                    <!-- Delete Button (POST Request) -->
+                    <form action="{{ url_for('delete_user', user_id=user.user_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this user?')">🗑️ Delete</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
-        <a href="/">Back to Home</a>
+
+        <a href="/">🏠 Back to Home</a>
     </div>
 </body>
 </html>
