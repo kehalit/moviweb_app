@@ -6,6 +6,18 @@ app = Flask(__name__)
 app.secret_key = "your_super_secret_key"
 data_manager = SQLiteDataManager(app)
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Handles 404 Not Found error."""
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    """Handles 500 Internal Server Error."""
+    return render_template('500.html'), 500
+
+
 @app.route('/')
 def home():
    #return "Welcome to MovieWeb! Go to /users to see all users."
