@@ -1,5 +1,6 @@
 from flask import Flask,render_template, request, redirect, url_for, session,flash
 from datamanager.sqllite_data_magager import SQLiteDataManager
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = "your_super_secret_key"
@@ -20,12 +21,10 @@ def users_list():
 
 @app.route('/users/<int:user_id>')
 def user_movies(user_id):
-    user = data_manager.get_user_movies(user_id)
-
+    user = data_manager.get_user(user_id)
     if user is None:
         return f"User with ID {user_id} not found.", 404
-
-    movies = data_manager.get_user_movies(user_id)
+    movies = user.movies
     if not movies:
         return f"No movies found for user {user_id}.", 404
     return render_template('user_movies.html', user=user, movies=movies)
