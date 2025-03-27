@@ -8,20 +8,29 @@
 <body>
     <div class="container">
         <h1>Update Movie: {{ movie.movie_name }}</h1>
-        <form action="{{ url_for('update_movie', user_id=user_id, movie_id=movie.movie_id) }}" method="POST">
-            <label for="name">Movie Name:</label>
-            <input type="text" id="name" name="name" value="{{ movie.movie_name }}" required>
+        <form class="form-container" action="{{ url_for('update_movie', user_id=user_id, movie_id=movie.movie_id) }}" method="POST">
+            <div class="form-group">
+    <label for="name">Movie Name:</label>
+    <input type="text" id="name" name="name" value="{{ movie.movie_name }}" required>
 
-            <label for="director">Director:</label>
-            <input type="text" id="director" name="director" value="{{ movie.director }}" required>
+</div>
+<div class="form-group">
+    <label for="director">Director:</label>
+    <input type="text" id="director" name="director" value="{{ movie.director }}" required>
 
-            <label for="year">Year:</label>
-            <input type="number" id="year" name="year" min="1888" max="2025" value="{{ movie.year }}" required>
+</div>
+<div class="form-group">
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" min="1888" max="2025" value="{{ movie.year }}" required>
 
-            <label for="rating">Rating:</label>
-            <input type="number" id="rating" name="rating" step="0.1" min="0" max="10" value="{{ movie.rating }}" required>
+</div>
+<div class="form-group">
 
-            <button type="submit">Update Movie</button>
+    <label for="rating">Rating:</label>
+    <input type="number" id="rating" name="rating" step="0.1" min="0" max="10" value="{{ movie.rating }}" required>
+
+</div>
+            <button class="add-action-button" type="submit">Update Movie</button>
         </form>
         <a href="{{ url_for('user_movies', user_id=user_id) }}">Back to Movies</a>
     </div>
