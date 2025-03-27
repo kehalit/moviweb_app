@@ -41,7 +41,6 @@ def add_user():
 
 @app.route('/users/<int:user_id>/add_movie', methods=['GET', 'POST'])
 def add_movie(user_id):
-    movies = data_manager.get_user_movies(user_id)  # Returns a list
     user = data_manager.get_user(user_id)  # Fetch the user by ID
 
     if user is None:
@@ -53,11 +52,12 @@ def add_movie(user_id):
         year = request.form.get('year')
         rating = request.form.get('rating')
 
-        if movie_name and director and year and rating:
-            data_manager.add_movie(user_id, movie_name, director, year, rating)
-            return redirect(url_for('user_movies', user_id=user_id))
+        # Add movie using the data manager method
+        data_manager.add_movie(user_id, movie_name, director, year, rating)
+        return redirect(url_for('user_movies', user_id=user_id))
 
-    return render_template('add_movie.html', user=user, movies=movies)  # Pass the user to the template
+    return render_template('add_movie.html', user=user)
+
 
 
 @app.route('/users/<user_id>/update_movie/<movie_id>', methods=['GET', 'POST'])
