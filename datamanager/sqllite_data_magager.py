@@ -1,13 +1,17 @@
 import os
-
+import requests
 from datamanager.data_manager_interface import DataManagerInterface
 from data_models import db, User, Movie
 
 
+OMDB_API_KEY = os.getenv('API_KEY')
+OMDB_URL = "http://www.omdbapi.com/"
+
 # Database configuration
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 database_path = os.path.join(basedir, 'db', 'movies.db')
-print(database_path)
+
+
 class SQLiteDataManager(DataManagerInterface):
     def __init__(self, app, db_file_name = "movies.db"):
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
@@ -16,6 +20,22 @@ class SQLiteDataManager(DataManagerInterface):
 
         with app.app_context():
             db.create_all()
+
+    def fetch_movie_details(self, movie_name):
+        """Fetch movie details from OMDb API."""
+        params = {"t": movie_name, "apikey": OMDB_API_KEY}
+        response = requests.get(OMDB_URL, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("Response") == "True":  # Movie found
+                return {
+                    "movie_name": data.get("Title"),
+                    "director": data.get("Director"),
+                    "year": data.get("Year"),
+                    "rating": data.get("imdbRating"),
+                }
+        return None  # Return None if movie not found
 
     def get_all_users(self):
         #return all users
@@ -64,3 +84,13 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.delete(movie) #sew
         db.session.commit()
         return True
+
+    def delete_user(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return False
+
+        db.session.delete(user)  # This will also delete related movies due to `cascade="all, delete-orphan"`
+        db.session.commit()
+        return True
+
