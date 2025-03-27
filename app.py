@@ -1,18 +1,19 @@
-from crypt import methods
-from flask import Flask,render_template, request, redirect, url_for
+from flask import Flask,render_template, request, redirect, url_for, session,flash
 from datamanager.sqllite_data_magager import SQLiteDataManager
 
 app = Flask(__name__)
+app.secret_key = "your_super_secret_key"
 data_manager = SQLiteDataManager(app)
 
 @app.route('/')
 def home():
    #return "Welcome to MovieWeb! Go to /users to see all users."
-    return render_template('home.html')
+    users = data_manager.get_all_users()
+    return render_template('home.html', users=users)
 
 
 @app.route('/users')
-def list_users():
+def users_list():
    users = data_manager.get_all_users()
    return render_template('users.html', users=users)
 
@@ -20,10 +21,14 @@ def list_users():
 @app.route('/users/<int:user_id>')
 def user_movies(user_id):
     user = data_manager.get_user_movies(user_id)
-    movies = data_manager.get_user_movies(user_id)
+
     if user is None:
         return f"User with ID {user_id} not found.", 404
-    return render_template('user_movies.html', user=user)
+
+    movies = data_manager.get_user_movies(user_id)
+    if not movies:
+        return f"No movies found for user {user_id}.", 404
+    return render_template('user_movies.html', user=user, movies=movies)
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
@@ -31,7 +36,7 @@ def add_user():
   if request.method == 'POST':
       user_name = request.form['name']
       new_user = data_manager.add_user(user_name)
-      return redirect(url_for('list_users'))
+      return redirect(url_for('users_list'))
   return render_template('add_user.html')
 
 
@@ -86,6 +91,17 @@ def delete_movie(user_id, movie_id):
 
     return render_template('delete_movie.html', user_id=user_id, movie=movie)
 
+
+@app.route('/users/<int:user_id>/delete', methods=['POST'])
+def delete_user(user_id):
+    user = data_manager.get_user(user_id)
+    if user:
+        data_manager.delete_user(user_id)
+        flash("User deleted successfully!", "success")
+    else:
+        flash ("Failed to delete user!", "error")
+
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
