@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
@@ -5,8 +6,9 @@ from werkzeug.exceptions import HTTPException
 
 # Initialize the Flask app
 app = Flask(__name__)
-app.secret_key = "your_super_secret_key"
+app.secret_key = os.getenv('SECRET_KEY')
 data_manager = SQLiteDataManager(app)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
