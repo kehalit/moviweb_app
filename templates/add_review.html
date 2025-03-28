@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a Review for - MovieWeb App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Add a Review for {{ movie.movie_name }} by {{ user.name }}</h1>
+        <form class="form-container" action="{{ url_for('add_review', user_id=user.user_id, movie_id= movie.movie_id) }}" method="POST">
+            <div class="form-group">
+                <label for="review_text">Review Text:</label>
+                <textarea placeholder="What do you think of this movie?"  id="review_text" name="review_text" rows="4" cols="50"></textarea>
+            </div>
+
+            <div class="form-group">
+                 <label for="rating">Rating:</label>
+            <input type="number" min="1" max="10" step="0.1" id="rating" name="rating" required>
+
+            </div>
+
+            <button class="add-action-button" type="submit">Submit Review</button>
+        </form>
+      <a class="link-button" href="{{ url_for('user_movies', user_id=user.user_id) }}">Back to {{ user.name }}'s Movies</a>
+    </div>
+</body>
+</html>
