@@ -24,3 +24,15 @@ class DataManagerInterface(ABC):
     @abstractmethod
     def delete_movie(self, user_id, movie_id):
         pass
+
+    @abstractmethod
+    def get_movie_reviews(self, movie_id):
+        pass
+
+    @abstractmethod
+    def get_user_reviews(self, user_id):
+        pass
+
+    @abstractmethod
+    def add_review(self, user_id, movie_id, review_text, rating):
+        pass
