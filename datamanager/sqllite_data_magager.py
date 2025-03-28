@@ -1,7 +1,7 @@
 import os
 import requests
 from datamanager.data_manager_interface import DataManagerInterface
-from data_models import db, User, Movie
+from data_models import db, User, Movie, Review
 from dotenv import load_dotenv
 
 # OMDb API configuration
@@ -143,3 +143,28 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.delete(user)  # This will also delete related movies due to `cascade="all, delete-orphan"`
         db.session.commit()
         return True  # Successfully deleted the user
+
+    def get_movie_reviews(self, movie_id):
+        return Review.query.filter_by(movie_id=movie_id).all()
+
+    def get_user_reviews(self, user_id):
+        return Review.query.filter_by(user_id=user_id).all()
+
+    def add_review(self, user_id, movie_id, review_text, rating):
+        movie = Movie.query.get(movie_id)
+        user = User.query.get(user_id)
+
+        if not movie or not user:
+            return None
+
+        new_review = Review(
+            user_id=user_id,
+            movie_id = movie_id,
+            review_text = review_text,
+            rating = float(rating)
+
+        )
+
+        db.session.add(new_review)
+        db.session.commit()
+        return new_review
