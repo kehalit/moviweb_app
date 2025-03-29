@@ -23,8 +23,9 @@ including title, director, year, and IMDb rating, review.
 3. Set up your environment variables:
    - FLASK_SECRET_KEY: Secret key for session management.
    - OMDB_API_KEY: Your OMDb API key
-4.Run the app:
-  flask run
+4. Run the app:
+     flask run
+   
 ## Database
 The app uses SQLite to store user and movie data locally.
 
