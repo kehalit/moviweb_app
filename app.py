@@ -1,4 +1,7 @@
 import os
+from csv import excel
+from multiprocessing.managers import Value
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
@@ -202,6 +205,33 @@ def delete_user(user_id):
         flash(f"An unexpected error occurred: {str(e)}", "error")
         return redirect(url_for('home'))
 
+
+@app.route("/users/<user_id>/movies/<movie_id>/add_review", methods=['GET', 'POST'])
+def add_review(user_id, movie_id):
+    user = data_manager.get_user(user_id)
+    movie = data_manager.get_movie(movie_id)
+
+    if request.method == 'POST':
+        review_text = request.form.get("review_text")
+        rating = request.form.get("rating")
+        if not rating:
+            flash('Rating is required', 'error')
+            return render_template("add_review.html", user=user, movie = movie)
+        try:
+            rating = float(rating)
+            if rating < 1 or rating > 10:
+                flash("Rating must be in between 1.0 to 10 !", "error")
+                return render_template("add_review.html", user=user, movie=movie)
+
+        except ValueError:
+            flash("Rating must be a valid number", "error")
+            return render_template("add_review.html", user=user, movie=movie)
+
+        data_manager.add_review(user_id, movie_id, review_text, rating)
+        flash("review added successfully", "success")
+        return redirect(url_for('user_movies', user_id=user_id))
+
+    return render_template("add_review.html", user=user, movie=movie)
 
 if __name__ == "__main__":
     app.run(debug=True)
