@@ -136,3 +136,21 @@ body {
     border-radius: 5px;
     cursor:pointer;
 }
+
+.flash {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius:5px;
+}
+
+.flash.success{
+    background-color: #408518;
+    color: white;
+
+}
+
+.flash.error{
+    background-color: #b5241f;
+    color: white;
+
+}
