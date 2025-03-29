@@ -1,7 +1,7 @@
 import os
 import requests
 from datamanager.data_manager_interface import DataManagerInterface
-from data_models import db, User, Movie, Review
+from datamanager.data_models import db, User, Movie, Review
 from dotenv import load_dotenv
 
 # OMDb API configuration
