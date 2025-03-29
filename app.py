@@ -1,7 +1,4 @@
 import os
-from csv import excel
-from multiprocessing.managers import Value
-
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
@@ -230,6 +227,7 @@ def add_review(user_id, movie_id):
         return redirect(url_for('user_movies', user_id=user_id))
 
     return render_template("add_review.html", user=user, movie=movie)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
