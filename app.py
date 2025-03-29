@@ -63,11 +63,9 @@ def user_movies(user_id):
     """Displays a user's movies."""
     try:
         user = data_manager.get_user(user_id)
-
         if user is None:
             return f"User with ID {user_id} not found.", 404
         movies = user.movies if user.movies else []
-
         return render_template('user_movies.html', user=user, movies=movies)
     except SQLAlchemyError as e:
         flash(f"Database error occurred: {str(e)}", "error")

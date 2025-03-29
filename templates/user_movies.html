@@ -2,31 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ user.name }} Movies</title>
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css') }}">
+    <title>{{ user.name }}'s Movies</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div>
-    <h1>{{ user.name }}'s Favorite Movies 🎬</h1>
-    <div class="user-container">
-        {% for movie in movies %}
+    <div class="container">
+        <h1>{{ user.name }}'s Favorite Movies 🎬</h1>
 
-             <div class="user-item">
-                 <span> {{ movie.movie_name }} ({{ movie.year }}) </span>
-                 <span>Directed by {{ movie.director }}</span>
-                 <span>⭐ {{ movie.rating }}/10</span>
-              <div class="user-actions">
-                  <a class ="action" href ="{{url_for('add_review', user_id=user.user_id, movie_id=movie.movie_id) }}">Add Review</a>
-                  <a class="action" href="{{ url_for('update_movie', user_id=user.user_id, movie_id=movie.movie_id) }}">✏️ Edit</a>
-              <a class="action" href="{{ url_for('delete_movie', user_id=user.user_id, movie_id=movie.movie_id) }}" onclick="return confirm('Are you sure?');">❌ Delete</a>
+        {% if movies %}
+            <div class="user-container">
+                {% for movie in movies %}
+                    <div class="user-item">
+                        <span><strong>{{ movie.movie_name }}</strong> ({{ movie.year }})</span>
+                        <span>🎬 Directed by {{ movie.director }}</span>
+                        <span>⭐ {{ movie.rating }}/10</span>
+                        <div class="user-actions">
+                            <a class="action" href="{{ url_for('add_review', user_id=user.user_id, movie_id=movie.movie_id) }}">💬 Add Review</a>
+                            <a class="action" href="{{ url_for('update_movie', user_id=user.user_id, movie_id=movie.movie_id) }}">✏️ Edit</a>
+                            <a class="action delete" href="{{ url_for('delete_movie', user_id=user.user_id, movie_id=movie.movie_id) }}" onclick="return confirm('Are you sure?');">❌ Delete</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-movies">
+                <p>🎥 {{ user.name }} hasn’t added any movies yet. Let’s change that! </p>
+                <p>Click below to add a favorite movie. ✨</p>
+            </div>
+        {% endif %}
 
-              </div>
-             </div>
-        {% endfor %}
+        <div class="actions">
+            <a class="link-button" href="{{ url_for('add_movie', user_id=user.user_id) }}">➕ Add Movie</a>
+            <a class="link-button back" href="{{ url_for('users_list') }}">🔙 Back to Users</a>
+        </div>
     </div>
-    <a class="link-button" href="{{ url_for('add_movie', user_id=user.user_id) }}">➕ Add Movie</a>
-    <a class="link-button" href="{{ url_for('users_list') }}">Back to Users</a>
-  </div>
-
 </body>
 </html>
