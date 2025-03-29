@@ -203,27 +203,46 @@ def delete_user(user_id):
 
 @app.route("/users/<user_id>/movies/<movie_id>/add_review", methods=['GET', 'POST'])
 def add_review(user_id, movie_id):
+    """
+    Handles the addition of a review for a specific movie by a user.
+
+    - GET request: Renders the review form for the user to submit a review for the movie.
+    - POST request: Validates and processes the review submitted by the user.
+
+    Parameters:
+    user_id (int): The ID of the user adding the review.
+    movie_id (int): The ID of the movie being reviewed.
+
+    Returns:
+    - Redirects to the movie's page if the review is added successfully.
+    - Renders the review form if there are validation errors or if it's a GET request.
+    """
+
     user = data_manager.get_user(user_id)
     movie = data_manager.get_movie(movie_id)
 
     if request.method == 'POST':
         review_text = request.form.get("review_text")
         rating = request.form.get("rating")
+
+        # Check if rating is provided
         if not rating:
             flash('Rating is required', 'error')
-            return render_template("add_review.html", user=user, movie = movie)
+            return render_template("add_review.html", user=user, movie=movie)
+
         try:
+            # Validate rating value
             rating = float(rating)
             if rating < 1 or rating > 10:
-                flash("Rating must be in between 1.0 to 10 !", "error")
+                flash("Rating must be between 1.0 and 10.0!", "error")
                 return render_template("add_review.html", user=user, movie=movie)
-
         except ValueError:
             flash("Rating must be a valid number", "error")
             return render_template("add_review.html", user=user, movie=movie)
 
+        # Add the review to the database
         data_manager.add_review(user_id, movie_id, review_text, rating)
-        flash("review added successfully", "success")
+        flash("Review added successfully", "success")
         return redirect(url_for('user_movies', user_id=user_id))
 
     return render_template("add_review.html", user=user, movie=movie)
