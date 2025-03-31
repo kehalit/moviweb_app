@@ -248,21 +248,26 @@ def add_review(user_id, movie_id):
     return render_template("add_review.html", user=user, movie=movie)
 
 
-@app.route('/movies/<int:movie_id>/reviews')
+@app.route('/movies/<int:movie_id>/reviews', methods=['GET', 'POST'])
 def view_reviews(movie_id):
-    """Displays all reviews for a specific movie."""
-    try:
-        movie = data_manager.get_movie(movie_id)
-        if movie is None:
-            return f"Movie with ID {movie_id} not found.", 404
+    """Displays reviews for a movie and allows deletion."""
+    movie = data_manager.get_movie(movie_id)
 
-        reviews = movie.reviews  # Assuming you have a relationship set up in SQLAlchemy
+    if not movie:
+        flash("Movie not found.", "error")
+        return redirect(url_for('users_list'))
 
-        return render_template('movie_reviews.html', movie=movie, reviews=reviews)
+    if request.method == "POST":
+        review_id = request.form.get("review_id")  # Get the review ID from form
+        if review_id and data_manager.delete_review(int(review_id)):
+            flash("Review deleted successfully!", "success")
+        else:
+            flash("Error deleting review.", "error")
 
-    except SQLAlchemyError as e:
-        flash(f"Database error occurred: {str(e)}", "error")
-        return redirect(url_for('home'))
+        return redirect(url_for('view_reviews', movie_id=movie_id))  # Refresh page
+
+    reviews = movie.reviews
+    return render_template('movie_reviews.html', movie=movie, reviews=reviews)
 
 
 if __name__ == "__main__":
