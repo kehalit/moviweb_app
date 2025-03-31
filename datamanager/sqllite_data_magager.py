@@ -1,5 +1,7 @@
 import os
 import requests
+from sqlalchemy.exc import SQLAlchemyError
+
 from datamanager.data_manager_interface import DataManagerInterface
 from datamanager.data_models import db, User, Movie, Review
 from dotenv import load_dotenv
@@ -168,3 +170,20 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.add(new_review)
         db.session.commit()
         return new_review
+
+    def view_review(self, movie_id):
+        """Fetch all reviews for a given movie ID."""
+        return Review.query.filter_by(movie_id=movie_id).all()
+
+    def delete_review(self, review_id):
+        """Delete a review by its ID."""
+        review = Review.query.get(review_id)
+        if Review:
+            try:
+                db.session.delete(review)
+                db.session.commit()
+                return True
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                print(f"Error deleting review: {str(e)}")
+        return False
