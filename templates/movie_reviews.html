@@ -2,29 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ movie.movie_name }} Reviews</title>
+    <title>Reviews for {{ movie.movie_name }}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div>
-        <h1>Reviews for {{ movie.movie_name }} ({{ movie.year }})</h1>
+    <h1>Reviews for "{{ movie.movie_name }}"</h1>
 
-        {% if reviews %}
-            <div class="review-container">
-                {% for review in reviews %}
-                    <div class="review-item">
-                        <p><strong>Rating:</strong> ⭐ {{ review.rating }}/10</p>
-                        <p><strong>Review:</strong> {{ review.review_text }}</p>
-                        <p><em>By User ID: {{ review.user_id }}</em></p>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p>No reviews yet. Be the first to write one!</p>
-        {% endif %}
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>Rating:</strong> ⭐ {{ review.rating }}/10<br>
+                    <strong>Review:</strong> {{ review.review_text or "No review text provided." }}
+                    <form action="{{ url_for('view_reviews', movie_id=movie.movie_id) }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="review_id" value="{{ review.review_id }}">
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this review?');">
+                            ❌ Delete
+                        </button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews available for this movie.</p>
+    {% endif %}
 
-        <a class="link-button" href="{{ url_for('add_review', user_id=user.user_id, movie_id=movie.movie_id) }}">➕ Write a Review</a>
-        <a class="link-button" href="{{ url_for('user_movies', user_id=movie.user_id) }}">Back to Movie List</a>
-    </div>
+    <a href="{{ url_for('add_review', movie_id=movie.movie_id, user_id=movie.user_id) }}">➕ Write a Review</a>
+    <a href="{{ url_for('users_list') }}">Back to Users</a>
 </body>
 </html>
