@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ movie.movie_name }} Reviews</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div>
+        <h1>Reviews for {{ movie.movie_name }} ({{ movie.year }})</h1>
+
+        {% if reviews %}
+            <div class="review-container">
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <p><strong>Rating:</strong> ⭐ {{ review.rating }}/10</p>
+                        <p><strong>Review:</strong> {{ review.review_text }}</p>
+                        <p><em>By User ID: {{ review.user_id }}</em></p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No reviews yet. Be the first to write one!</p>
+        {% endif %}
+
+        <a class="link-button" href="{{ url_for('add_review', user_id=user.user_id, movie_id=movie.movie_id) }}">➕ Write a Review</a>
+        <a class="link-button" href="{{ url_for('user_movies', user_id=movie.user_id) }}">Back to Movie List</a>
+    </div>
+</body>
+</html>
