@@ -162,3 +162,55 @@ body {
     color: #555;
     font-size: 16px;
 }
+
+/* Container Styling */
+.review-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Review Items */
+.review-item {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+/* Review Text */
+.review-text {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Rating Stars */
+.review-rating {
+    font-size: 18px;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+/* Delete Button */
+.delete-review-btn {
+    background: #e63946;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.delete-review-btn:hover {
+    background: #b02735;
+}
