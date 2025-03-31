@@ -248,5 +248,22 @@ def add_review(user_id, movie_id):
     return render_template("add_review.html", user=user, movie=movie)
 
 
+@app.route('/movies/<int:movie_id>/reviews')
+def view_reviews(movie_id):
+    """Displays all reviews for a specific movie."""
+    try:
+        movie = data_manager.get_movie(movie_id)
+        if movie is None:
+            return f"Movie with ID {movie_id} not found.", 404
+
+        reviews = movie.reviews  # Assuming you have a relationship set up in SQLAlchemy
+
+        return render_template('movie_reviews.html', movie=movie, reviews=reviews)
+
+    except SQLAlchemyError as e:
+        flash(f"Database error occurred: {str(e)}", "error")
+        return redirect(url_for('home'))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
