@@ -12,6 +12,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
+
     movies = db.relationship('Movie', backref= 'user', cascade = "all, delete-orphan")
     reviews = db.relationship('Review', backref= 'user', cascade = "all, delete-orphan")
 
@@ -24,10 +25,13 @@ class Movie(db.Model):
 
     movie_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     movie_name = db.Column(db.String(255), nullable=False)
-    director = db.Column(db.String(255), nullable = False)
+
+    director_id = db.Column(db.Integer, db.ForeignKey('directors.director_id'), nullable = False)
+
     year = db.Column(db.Integer, nullable=False)
     rating = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+
     reviews = db.relationship('Review', backref= 'movie', cascade = "all, delete-orphan")
 
     def __str__(self):
@@ -51,4 +55,20 @@ class Review(db.Model):
         return (
                 f"review(id= {self.review_id}, review_text={self.review_text},"
                 f"rating={self.rating})"
+        )
+
+
+class Director(db.Model):
+    __tablename__ = 'directors'
+
+    director_id = db.Column(db.Integer, primary_key= True, autoincrement=True)
+    name = db.Column(db.String(255), nullable = False)
+    birth_date = db.Column(db.Date, nullable = False)
+
+    movies = db.relationship('Movie', backref = 'director', cascade="all, delete-orphan")
+
+    def __str__(self):
+        return (
+            f"director(id= {self.director_id}, name={self.name},"
+            f"birth_date={self.birth_date})"
         )
