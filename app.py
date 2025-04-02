@@ -132,48 +132,41 @@ def add_movie(user_id):
 
 @app.route('/users/<int:user_id>/update_movie/<int:movie_id>', methods=['GET', 'POST'])
 def update_movie(user_id, movie_id):
-    """Handles the update of a movie for a specific user."""
+    """
+    Handles the movie update for a specific user.
+    Users can only change the movie name, and the system fetches the latest details from OMDb API.
+    """
     try:
         movie = data_manager.get_movie(movie_id)
-        if movie is None:
-            return f"Movie with ID {movie_id} not found.", 404
+
+        if not movie:
+            flash(f"❌ Movie with ID {movie_id} not found.", "error")
+            return redirect(url_for('user_movies', user_id=user_id))
 
         if request.method == 'POST':
-            movie_data_from_api = data_manager.fetch_movie_details(movie.movie_name)
+            new_movie_name = request.form.get('movie_name')
 
-            # Check if the user has modified the fields, if not compare with API data
-            movie_name_changed = request.form['name'] != movie.movie_name
-            director_changed = request.form['director'] != movie.director
-            year_changed = int(request.form['year']) != movie.year
-            rating_changed = float(request.form['rating']) != movie.rating
+            if not new_movie_name:
+                flash("❌ Please enter a valid movie name!", "error")
+                return render_template('update_movie.html', movie=movie, user_id=user_id)
 
-            if not (movie_name_changed or director_changed or year_changed or rating_changed):
-                # If nothing has changed, compare with the API data
-                if movie_data_from_api:
-                    if movie_data_from_api['movie_name'] != movie.movie_name:
-                        movie.movie_name = movie_data_from_api['movie_name']
-                    if movie_data_from_api['director'] != movie.director:
-                        movie.director = movie_data_from_api['director']
-                    if int(movie_data_from_api['year']) != movie.year:
-                        movie.year = int(movie_data_from_api['year'])
-                    if float(movie_data_from_api['rating']) != movie.rating:
-                        movie.rating = float(movie_data_from_api['rating'])
-            else:
-                movie.movie_name = request.form['name']
-                movie.director = request.form['director']
-                movie.year = int(request.form['year'])
-                movie.rating = float(request.form['rating'])
+            updated_movie = data_manager.update_movie(movie_id, new_movie_name)
+            if not updated_movie:
+                flash("❌ Movie not found in OMDb. Please check the name and try again.", "error")
+                return render_template('update_movie.html', movie=movie, user_id=user_id)
 
-            data_manager.update_movie(movie)
+            flash(f"✅ '{new_movie_name}' updated successfully!", "success")
             return redirect(url_for('user_movies', user_id=user_id))
 
         return render_template('update_movie.html', movie=movie, user_id=user_id)
+
     except SQLAlchemyError as e:
-        flash(f"Database error occurred: {str(e)}", "error")
-        return redirect(url_for('user_movies', user_id=user_id))
+        flash(f"❌ Database error: {str(e)}", "error")
+        session.rollback()
     except Exception as e:
-        flash(f"An unexpected error occurred: {str(e)}", "error")
-        return redirect(url_for('user_movies', user_id=user_id))
+        flash(f"❌ Unexpected error: {str(e)}", "error")
+
+    return redirect(url_for('user_movies', user_id=user_id))
 
 
 @app.route('/users/<int:user_id>/delete_movie/<int:movie_id>', methods=['GET', 'POST'])
