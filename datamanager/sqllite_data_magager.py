@@ -1,7 +1,6 @@
 import os
 import requests
 from sqlalchemy.exc import SQLAlchemyError
-
 from datamanager.data_manager_interface import DataManagerInterface
 from datamanager.data_models import db, User, Movie, Review
 from dotenv import load_dotenv
@@ -94,7 +93,7 @@ class SQLiteDataManager(DataManagerInterface):
         return new_movie
 
 
-    def update_movie(self, movie_id, movie_name=None, director=None, year=None, rating=None):
+    def update_movie(self, movie_id, new_movie_name):
         """
         Update the details of a specific movie in the database.
 
@@ -106,29 +105,33 @@ class SQLiteDataManager(DataManagerInterface):
             rating (float, optional): The new IMDB rating.
         """
         movie = Movie.query.get(movie_id)
-        if movie:
-            if movie_name:
-                movie.movie_name = movie_name
-            if director:
-                movie.director = director
-            if year:
-                movie.year = year
-            if rating:
-                movie.rating = rating
 
-            db.session.commit()
-            return movie
-        return None  # If the movie does not exist, return None
+        if not movie:
+            return None
+
+        updated_movie_data = self.fetch_movie_details(new_movie_name)
+        if not updated_movie_data:
+            print("❌ Movie not found in OMDb.")  # Debugging print
+            return None
+
+        movie.movie_name = updated_movie_data["movie_name"]
+        movie.director = updated_movie_data["director"]
+        movie.year = int(updated_movie_data["year"])
+        movie.rating = float(updated_movie_data["rating"])
+
+        db.session.commit()
+        return movie
+
 
     def delete_movie(self, movie_id):
         """Delete a specific movie from the database."""
         movie = Movie.query.get(movie_id)
         if not movie:
-            return False  # Movie not found
+            return False
 
         db.session.delete(movie)
         db.session.commit()
-        return True  # Successfully deleted the movie
+        return True
 
     def delete_user(self, user_id):
         """Delete a specific user from the database."""
