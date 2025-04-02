@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
@@ -86,32 +86,48 @@ def add_user():
         return redirect(url_for('add_user'))
 
 
-@app.route('/users/<int:user_id>/add_movie', methods=['GET', 'POST'])
+@app.route("/users/<int:user_id>/add_movie", methods=["GET", "POST"])
 def add_movie(user_id):
-    """Handles adding a movie for a specific user."""
-    try:
-        user = data_manager.get_user(user_id)
-        if user is None:
-            return f"User with ID {user_id} not found.", 404
+    """
+    Handle adding a new movie for a specific user.
 
-        if request.method == 'POST':
-            movie_name = request.form.get('name')
-            director = request.form.get('director')
-            year = request.form.get('year')
-            rating = request.form.get('rating')
+    - If accessed via GET: Displays the movie addition form.
+    - If accessed via POST: Retrieves movie details from OMDb and adds the movie.
 
-            if not movie_name or not director or not year or not rating:
-                flash("Please fill in all fields!", "error")
-                return redirect(url_for('add_movie', user_id=user_id))
+    Args:
+        user_id (int): The ID of the user adding the movie.
 
-            # Add movie using the data manager method
-            data_manager.add_movie(user_id, movie_name, director, year, rating)
-            return redirect(url_for('user_movies', user_id=user_id))
+    Returns:
+        - Renders add_movie.html for GET requests.
+        - Redirects to the user's movie list after a successful addition.
+        - Re-renders the form with an error message if the movie is not found.
+    """
+    user = data_manager.get_user(user_id)  # Fetch user from database
 
-        return render_template('add_movie.html', user=user)
-    except SQLAlchemyError as e:
-        flash(f"Database error occurred: {str(e)}", "error")
-        return redirect(url_for('user_movies', user_id=user_id))
+    if not user:
+        flash("❌ User not found!", "error")
+        return redirect(url_for("home"))
+
+    if request.method == "GET":
+        session.pop('_flashes', None)
+
+    if request.method == "POST":
+        movie_name = request.form.get("movie_name")
+
+        if not movie_name:
+            flash("❌ Please enter a movie name!", "error")
+            return render_template("add_movie.html", user=user, user_id=user_id)
+
+        new_movie = data_manager.add_movie(user_id, movie_name)
+
+        if not new_movie:
+            flash("❌ Movie not found in OMDb. Please check the name and try again.", "error")
+            return render_template("add_movie.html", user=user, user_id=user_id)
+
+        flash(f"✅ '{movie_name}' added successfully!", "success")
+        return redirect(url_for("user_movies", user_id=user_id))
+
+    return render_template("add_movie.html", user=user, user_id=user_id)
 
 
 @app.route('/users/<int:user_id>/update_movie/<int:movie_id>', methods=['GET', 'POST'])
