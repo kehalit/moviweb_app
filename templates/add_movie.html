@@ -9,31 +9,24 @@
 <body>
     <div class="container">
         <h1>Add a Movie for {{ user.name }}</h1>
-        <form class="form-container" action="{{ url_for('add_movie', user_id=user.user_id) }}" method="POST">
-            <div class="form-group">
-                <label for="name">Movie Name:</label>
-            <input type="text" id="name" name="name" required>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+             <div class="flash-messages">
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
             </div>
+        {% endif %}
+    {% endwith %}
 
-            <div class="form-group">
-                 <label for="director">Director:</label>
-            <input type="text" id="director" name="director" required>
-
-            </div>
-
-           <div class="form-group">
-                <label for="year">Year:</label>
-            <input type="number" id="year" name="year" min="1888" max="2025" required>
-
-           </div>
-
-            <div class="form-group">
-                 <label for="rating">Rating:</label>
-            <input type="number" id="rating" name="rating" step="0.1" min="0" max="10" required>
-
-            </div>
-            <button class="add-action-button" type="submit">Add Movie</button>
+        <form action="{{ url_for('add_movie', user_id=user_id) }}" method="POST">
+            <label for="movie_name">Movie Name:</label>
+            <input type="text" id="movie_name" name="movie_name" required>
+            <button type="submit">Add Movie</button>
         </form>
+
         <a class="link-button" href="{{ url_for('user_movies', user_id=user.user_id) }}">Back to {{ user.name }}'s Movies</a>
     </div>
 </body>
