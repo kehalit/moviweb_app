@@ -20,7 +20,7 @@
                             <a class="action" href="{{ url_for('add_review', user_id=user.user_id, movie_id=movie.movie_id) }}">💬 Add Review</a>
                             <a class="action" href="{{ url_for('update_movie', user_id=user.user_id, movie_id=movie.movie_id) }}">✏️ Edit</a>
                             <a class="action" href="{{ url_for('view_reviews', movie_id=movie.movie_id) }}">📜 View Reviews</a>
-                            <a class="action delete" href="{{ url_for('delete_movie', user_id=user.user_id, movie_id=movie.movie_id) }}" onclick="return confirm('Are you sure?');">❌ Delete</a>
+                            <a class="action delete" href="{{ url_for('delete_movie', user_id=user.user_id, movie_id=movie.movie_id) }}">❌ Delete</a>
                         </div>
                     </div>
                 {% endfor %}
