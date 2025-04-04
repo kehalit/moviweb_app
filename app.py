@@ -145,12 +145,15 @@ def update_movie(user_id, movie_id):
 
         if request.method == 'POST':
             new_movie_name = request.form.get('movie_name')
+            new_director = request.form.get('director')
+            new_year = int(request.form.get('year'))
+            new_rating = float(request.form.get('rating'))
 
             if not new_movie_name:
                 flash("❌ Please enter a valid movie name!", "error")
                 return render_template('update_movie.html', movie=movie, user_id=user_id)
 
-            updated_movie = data_manager.update_movie(movie_id, new_movie_name)
+            updated_movie = data_manager.update_movie(movie_id, new_movie_name, new_director, new_year, new_rating)
             if not updated_movie:
                 flash("❌ Movie not found in OMDb. Please check the name and try again.", "error")
                 return render_template('update_movie.html', movie=movie, user_id=user_id)
