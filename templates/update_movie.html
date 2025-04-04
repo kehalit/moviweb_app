@@ -21,6 +21,16 @@
             <label for="movie_name">Movie Name:</label>
             <input type="text" id="movie_name" name="movie_name" value="{{ movie.movie_name }}" required>
 
+           <label for="director">Director:</label>
+           <input type="text" id="director" name="director" value="{{ movie.director }}" required>
+
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year" value="{{ movie.year }}" required>
+
+            <label for="rating">Rating:</label>
+            <input type="number" id="rating" name="rating" value="{{ movie.rating }}" required step="0.1" min="0" max="10">
+
+
             <button type="submit">Update Movie</button>
         </form>
         <a class="link-button" href="{{ url_for('user_movies', user_id=user_id) }}">Back to Movies</a>
