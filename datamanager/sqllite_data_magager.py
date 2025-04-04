@@ -93,7 +93,7 @@ class SQLiteDataManager(DataManagerInterface):
         return new_movie
 
 
-    def update_movie(self, movie_id, new_movie_name):
+    def update_movie(self, movie_id, new_movie_name, new_director, new_year, new_rating):
         """
         Update the details of a specific movie in the database.
 
@@ -114,10 +114,10 @@ class SQLiteDataManager(DataManagerInterface):
             print("❌ Movie not found in OMDb.")  # Debugging print
             return None
 
-        movie.movie_name = updated_movie_data["movie_name"]
-        movie.director = updated_movie_data["director"]
-        movie.year = int(updated_movie_data["year"])
-        movie.rating = float(updated_movie_data["rating"])
+        movie.movie_name = new_movie_name
+        movie.director =new_director
+        movie.year = new_year
+        movie.rating = new_rating
 
         db.session.commit()
         return movie
