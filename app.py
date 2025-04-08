@@ -3,11 +3,14 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from datamanager.sqllite_data_magager import SQLiteDataManager
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
+from api import api, init_data_manager
 
 # Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 data_manager = SQLiteDataManager(app)
+init_data_manager(data_manager)
+app.register_blueprint(api, url_prefix='/api')
 
 
 @app.errorhandler(404)
