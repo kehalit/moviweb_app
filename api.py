@@ -52,3 +52,39 @@ def get_user_movies(user_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api.route('/users/<int:user_id>/movies', methods=['POST'])
+def add_movie_to_user(user_id):
+    """Add a new favorite movie for a user."""
+    try:
+        data = request.get_json()
+        if not data or 'title' not in data:
+            return jsonify({'error': 'Missing movie title in request'}), 400
+
+        title = data['title']
+        user = data_manager.get_user(user_id)
+
+        if not user:
+            return jsonify({'error': f'User with ID {user_id} not found'}), 404
+
+        movie = data_manager.add_movie(user_id, title)
+
+        if not movie:
+            return jsonify({'error': 'Movie not found in OMDb'}), 404
+
+        movie_data = {
+            "movie_id": movie.movie_id,
+            "title": movie.movie_name,  # Try movie.movie_name or whatever works
+            "director": movie.director,
+            "year": movie.year,
+            "rating": movie.rating
+        }
+
+        return jsonify({'message': 'Movie added successfully', 'movie': movie_data}), 201
+
+    except SQLAlchemyError as e:
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
