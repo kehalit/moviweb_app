@@ -1,6 +1,7 @@
 
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
+
 from datamanager.sqllite_data_magager import SQLiteDataManager
 
 
@@ -28,3 +29,26 @@ def get_users():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
+@api.route('/users/<int:user_id>/movies', methods=['GET'])
+def get_user_movies(user_id):
+    try:
+        user = data_manager.get_user(user_id)
+        if not user:
+            return jsonify({"error": f"User with ID {user_id} not found"}), 404
+
+        movies_data = [{
+            "movie_id": movie.movie_id,
+            "title": movie.movie_name,  # Try movie.movie_name or whatever works
+            "director": movie.director,
+            "year": movie.year,
+            "rating": movie.rating
+        } for movie in user.movies]
+
+        return jsonify({
+            "user_id": user.user_id,
+            "name": user.name,
+            "movies": movies_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
