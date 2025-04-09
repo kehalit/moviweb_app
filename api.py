@@ -1,23 +1,31 @@
-
-from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
+from sqlalchemy.exc import SQLAlchemyError
 
 from datamanager.sqllite_data_magager import SQLiteDataManager
-
 
 api = Blueprint('api', __name__)
 data_manager = None
 
 
 def init_data_manager(data_manager_app):
-    """ Inititalite the data_manager with the Flask App"""
+    """
+    Initializes the global data_manager used across the API.
+
+    Args:
+        data_manager_app (SQLiteDataManager): The data manager instance from the app.
+    """
     global data_manager
     data_manager = data_manager_app
 
 
 @api.route('/users', methods=['GET'])
 def get_users():
-    """Return a list of all users as JSON"""
+    """
+    Retrieve a list of all users.
+
+    Returns:
+        JSON: A list of user objects with their ID and name.
+    """
     try:
         users = data_manager.get_all_users()
         users_data = [{
@@ -31,6 +39,15 @@ def get_users():
 
 @api.route('/users/<int:user_id>/movies', methods=['GET'])
 def get_user_movies(user_id):
+    """
+    Retrieve a list of movies for a specific user.
+
+    Args:
+        user_id (int): The user's ID.
+
+    Returns:
+        JSON: User details along with their list of movies.
+    """
     try:
         user = data_manager.get_user(user_id)
         if not user:
@@ -38,7 +55,7 @@ def get_user_movies(user_id):
 
         movies_data = [{
             "movie_id": movie.movie_id,
-            "title": movie.movie_name,  # Try movie.movie_name or whatever works
+            "title": movie.movie_name,
             "director": movie.director,
             "year": movie.year,
             "rating": movie.rating
@@ -56,7 +73,20 @@ def get_user_movies(user_id):
 
 @api.route('/users/<int:user_id>/movies', methods=['POST'])
 def add_movie_to_user(user_id):
-    """Add a new favorite movie for a user."""
+    """
+    Add a new favorite movie to a user's collection.
+
+    Request JSON:
+        {
+            "title": "Movie Title"
+        }
+
+    Args:
+        user_id (int): The user's ID.
+
+    Returns:
+        JSON: Confirmation message and movie data if successful.
+    """
     try:
         data = request.get_json()
         if not data or 'title' not in data:
@@ -75,7 +105,7 @@ def add_movie_to_user(user_id):
 
         movie_data = {
             "movie_id": movie.movie_id,
-            "title": movie.movie_name,  # Try movie.movie_name or whatever works
+            "title": movie.movie_name,
             "director": movie.director,
             "year": movie.year,
             "rating": movie.rating
@@ -87,4 +117,3 @@ def add_movie_to_user(user_id):
         return jsonify({'error': f'Database error: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
