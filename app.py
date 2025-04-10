@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException
 from api import api, init_data_manager
 
+
 # Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -30,10 +31,10 @@ def handle_exception(e):
     """Handles generic exceptions."""
     if isinstance(e, HTTPException):
         return e  # If it's a Flask HTTPException (e.g., 404, 405), return it directly
-    else:
+
         # Log the error or notify the admin if necessary
-        flash(f"An unexpected error occurred: {str(e)}", "error")
-        return redirect(url_for('home'))  # Redirect to home page with error message
+    flash(f"An unexpected error occurred: {str(e)}", "error")
+    return redirect(url_for('home'))  # Redirect to home page with error message
 
 
 @app.route('/')
