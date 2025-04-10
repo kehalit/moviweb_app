@@ -4,6 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from datamanager.data_manager_interface import DataManagerInterface
 from datamanager.data_models import db, User, Movie, Review
 from dotenv import load_dotenv
+from pathlib import Path
+
 
 # OMDb API configuration
 load_dotenv()
@@ -12,14 +14,14 @@ OMDB_API_KEY = os.getenv('API_KEY')
 
 
 # Database configuration
-basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+basedir = Path(__file__).resolve().parent.parent
 database_path = os.path.join(basedir, 'db', 'movies.db')
 
 
 class SQLiteDataManager(DataManagerInterface):
     """SQLite data manager for handling movie and user data in the database."""
 
-    def __init__(self, app, db_file_name="movies.db"):
+    def __init__(self, app):
         """Initialize the data manager with Flask app and configure the database."""
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -30,8 +32,10 @@ class SQLiteDataManager(DataManagerInterface):
 
     def fetch_movie_details(self, movie_name):
         """Fetch movie details from OMDb API."""
+
+        timeout_duration = 10
         params = {"t": movie_name, "apikey": OMDB_API_KEY}
-        response = requests.get(OMDB_API_URL, params=params)
+        response = requests.get(OMDB_API_URL, params=params, timeout= timeout_duration)
 
         if response.status_code == 200:
             data = response.json()
@@ -144,12 +148,43 @@ class SQLiteDataManager(DataManagerInterface):
         return True  # Successfully deleted the user
 
     def get_movie_reviews(self, movie_id):
+        """
+                Retrieves all reviews for a specific movie.
+
+                Args:
+                    movie_id (int): The ID of the movie for which reviews are being fetched.
+
+                Returns:
+                    list: A list of all review objects associated with the given movie ID.
+        """
         return Review.query.filter_by(movie_id=movie_id).all()
 
     def get_user_reviews(self, user_id):
+        """
+                Retrieves all reviews submitted by a specific user.
+
+                Args:
+                    user_id (int): The ID of the user for which reviews are being fetched.
+
+                Returns:
+                    list: A list of all review objects submitted by the given user ID.
+        """
         return Review.query.filter_by(user_id=user_id).all()
 
     def add_review(self, user_id, movie_id, review_text, rating):
+        """
+            Adds a new review for a specific movie by a user.
+
+            Args:
+                 user_id (int): The ID of the user submitting the review.
+                 movie_id (int): The ID of the movie being reviewed.
+                review_text (str): The text content of the review.
+                rating (float): The rating given by the user for the movie, between 1.0 and 10.0.
+
+            Returns:
+                Review or None: Returns the created Review object if successful,
+                                    or None if the movie or user does not exist.
+        """
         movie = Movie.query.get(movie_id)
         user = User.query.get(user_id)
 
